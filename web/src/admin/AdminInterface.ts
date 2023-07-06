@@ -11,6 +11,7 @@ import { autoDetectLanguage } from "@goauthentik/common/ui/locale";
 import { me } from "@goauthentik/common/users";
 import { WebsocketClient } from "@goauthentik/common/ws";
 import { Interface } from "@goauthentik/elements/Base";
+import "@goauthentik/elements/enterprise/EnterpriseStatusBanner";
 import "@goauthentik/elements/messages/MessageContainer";
 import "@goauthentik/elements/messages/MessageContainer";
 import "@goauthentik/elements/notifications/APIDrawer";
@@ -30,7 +31,14 @@ import PFDrawer from "@patternfly/patternfly/components/Drawer/drawer.css";
 import PFPage from "@patternfly/patternfly/components/Page/page.css";
 import PFBase from "@patternfly/patternfly/patternfly-base.css";
 
-import { AdminApi, CapabilitiesEnum, CoreApi, SessionUser, UiThemeEnum, Version } from "@goauthentik/api";
+import {
+    AdminApi,
+    CapabilitiesEnum,
+    CoreApi,
+    SessionUser,
+    UiThemeEnum,
+    Version,
+} from "@goauthentik/api";
 
 autoDetectLanguage();
 
@@ -69,7 +77,13 @@ export class AdminInterface extends Interface {
                 .display-none {
                     display: none;
                 }
+                :host {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                }
                 .pf-c-page {
+                    flex-grow: 1;
                     background-color: var(--pf-c-page--BackgroundColor) !important;
                 }
                 /* Global page background colour */
@@ -114,54 +128,56 @@ export class AdminInterface extends Interface {
     }
 
     render(): TemplateResult {
-        return html` <div class="pf-c-page">
-            <ak-sidebar
-                class="pf-c-page__sidebar ${this.sidebarOpen
-                    ? "pf-m-expanded"
-                    : "pf-m-collapsed"} ${this.activeTheme === UiThemeEnum.Light
-                    ? "pf-m-light"
-                    : ""}"
-            >
-                ${this.renderSidebarItems()}
-            </ak-sidebar>
-            <div class="pf-c-page__drawer">
-                <div
-                    class="pf-c-drawer ${this.notificationDrawerOpen || this.apiDrawerOpen
+        return html`<ak-enterprise-status></ak-enterprise-status>
+            <div class="pf-c-page">
+                <ak-sidebar
+                    class="pf-c-page__sidebar ${this.sidebarOpen
                         ? "pf-m-expanded"
-                        : "pf-m-collapsed"}"
+                        : "pf-m-collapsed"} ${this.activeTheme === UiThemeEnum.Light
+                        ? "pf-m-light"
+                        : ""}"
                 >
-                    <div class="pf-c-drawer__main">
-                        <div class="pf-c-drawer__content">
-                            <div class="pf-c-drawer__body">
-                                <main class="pf-c-page__main">
-                                    <ak-router-outlet
-                                        role="main"
-                                        class="pf-c-page__main"
-                                        tabindex="-1"
-                                        id="main-content"
-                                        defaultUrl="/administration/overview"
-                                        .routes=${ROUTES}
-                                    >
-                                    </ak-router-outlet>
-                                </main>
+                    ${this.renderSidebarItems()}
+                </ak-sidebar>
+                <div class="pf-c-page__drawer">
+                    <div
+                        class="pf-c-drawer ${this.notificationDrawerOpen || this.apiDrawerOpen
+                            ? "pf-m-expanded"
+                            : "pf-m-collapsed"}"
+                    >
+                        <div class="pf-c-drawer__main">
+                            <div class="pf-c-drawer__content">
+                                <div class="pf-c-drawer__body">
+                                    <main class="pf-c-page__main">
+                                        <ak-router-outlet
+                                            role="main"
+                                            class="pf-c-page__main"
+                                            tabindex="-1"
+                                            id="main-content"
+                                            defaultUrl="/administration/overview"
+                                            .routes=${ROUTES}
+                                        >
+                                        </ak-router-outlet>
+                                    </main>
+                                </div>
                             </div>
+                            <ak-notification-drawer
+                                class="pf-c-drawer__panel pf-m-width-33 ${this
+                                    .notificationDrawerOpen
+                                    ? ""
+                                    : "display-none"}"
+                                ?hidden=${!this.notificationDrawerOpen}
+                            ></ak-notification-drawer>
+                            <ak-api-drawer
+                                class="pf-c-drawer__panel pf-m-width-33 ${this.apiDrawerOpen
+                                    ? ""
+                                    : "display-none"}"
+                                ?hidden=${!this.apiDrawerOpen}
+                            ></ak-api-drawer>
                         </div>
-                        <ak-notification-drawer
-                            class="pf-c-drawer__panel pf-m-width-33 ${this.notificationDrawerOpen
-                                ? ""
-                                : "display-none"}"
-                            ?hidden=${!this.notificationDrawerOpen}
-                        ></ak-notification-drawer>
-                        <ak-api-drawer
-                            class="pf-c-drawer__panel pf-m-width-33 ${this.apiDrawerOpen
-                                ? ""
-                                : "display-none"}"
-                            ?hidden=${!this.apiDrawerOpen}
-                        ></ak-api-drawer>
                     </div>
                 </div>
-            </div>
-        </div>`;
+            </div>`;
     }
 
     renderSidebarItems(): TemplateResult {
