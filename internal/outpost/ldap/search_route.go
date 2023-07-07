@@ -5,6 +5,7 @@ import (
 
 	"beryju.io/ldap"
 	goldap "github.com/go-ldap/ldap/v3"
+
 	"goauthentik.io/internal/outpost/ldap/constants"
 	"goauthentik.io/internal/outpost/ldap/search"
 )
